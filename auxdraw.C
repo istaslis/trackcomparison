@@ -102,13 +102,18 @@ void DrawCompare(TH1F *h1, TH1F *h2, int color1 = kBlack, int color2 = kBlue, TS
 
 }
 
-void DrawCompare(TH1F *h1, TH1F *h2,TH1F *h3, TH1F *h4, int color1 = kBlack, int color2 = kBlue,int color3 = kBlack, int color4 = kBlue, TString legend1 = "Data", TString legend2 = "MC", TString legend3 = "Data2", TString legend4 = "MC2", TString title = "compare", TString caption = "A_{J}", bool divide = true, bool logy = false)
+int canvcounter = 0;
+
+void DrawCompare(TH1F *&h1, TH1F *&h2,TH1F *&h3, TH1F *&h4, int color1 = kBlack, int color2 = kBlue,int color3 = kBlack, int color4 = kBlue, TString legend1 = "Data", TString legend2 = "MC", TString legend3 = "Data2", TString legend4 = "MC2", TString title = "compare", TString caption = "A_{J}", bool divide = true, bool logy = false)
 {
   h1->Scale(1/h1->Integral());
   h2->Scale(1/h2->Integral());
   h3->Scale(1/h3->Integral());
   h4->Scale(1/h4->Integral());
 
+  canvcounter++;
+
+  //  TCanvas *c1 = new TCanvas("canv"+TString::Itoa(canvcounter,10),title,600,700);
   TCanvas *c1 = new TCanvas(title,title,600,700);
   TPad *pad1 = new TPad("pad1","pad1",0,0.4,1,1);
   pad1->SetBottomMargin(0);
@@ -130,6 +135,16 @@ void DrawCompare(TH1F *h1, TH1F *h2,TH1F *h3, TH1F *h4, int color1 = kBlack, int
   h2->SetMarkerColor(color2);  h2->SetLineColor(color2);
   h3->SetMarkerColor(color3);  h3->SetLineColor(color3);
   h4->SetMarkerColor(color4);  h4->SetLineColor(color4);
+  h1->SetMarkerStyle(kFullCircle);  h2->SetMarkerStyle(kFullCircle);
+  h3->SetMarkerStyle(kFullSquare);  h4->SetMarkerStyle(kFullSquare);
+
+  if (!logy) {
+    h1->SetMinimum(0.);
+    h2->SetMinimum(0.);
+    h3->SetMinimum(0.);
+    h4->SetMinimum(0.);
+  }
+
   h1->Draw();
   h2->Draw("same");
   h3->Draw("same");
@@ -176,12 +191,13 @@ void DrawCompare(TH1F *h1, TH1F *h2,TH1F *h3, TH1F *h4, int color1 = kBlack, int
     hd2->Add(h3,h4,1,-1);
   }
 
-  hd1->GetYaxis()->SetTitle(divide ? "ratio" : "difference");
+  hd1->GetYaxis()->SetTitle(divide ? "Data/MC" : "difference");
   hd1->GetXaxis()->SetTitle(caption);
   hd1->GetXaxis()->SetTitleOffset(3.5);
   //  drawText(var,0.18,0.8,kBlack,20);
 
-  hd1->SetMarkerStyle(21);
+  hd1->SetMarkerStyle(kFullCircle);
+  hd2->SetMarkerStyle(kFullSquare);
   hd1->Draw("ep");
   hd2->Draw("ep,same");
 

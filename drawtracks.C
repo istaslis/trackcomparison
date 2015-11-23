@@ -1,3 +1,9 @@
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TLine.h"
+#include "TFile.h"
+#include "TCanvas.h"
+
 #include "auxdraw.C"
 
 int canvascount = 0;
@@ -25,10 +31,32 @@ TH1F *getRatio(TString hname)
   return h3;
 }
 
-void Draw(TString var, TString caption, bool logy=false)
+void Draw(TString var, TString caption, bool logy=false, float ymin = 999, float ymax = 999)
 {
+  auto h1 = (TH1F*)_file1->Get(var);
+  auto h2 = (TH1F*)_file2->Get(var);
+  auto h3 = (TH1F*)_file3->Get(var);
+  auto h4 = (TH1F*)_file4->Get(var);
 
-  DrawCompare((TH1F*)_file1->Get(var),(TH1F*)_file2->Get(var), (TH1F*)_file3->Get(var),(TH1F*)_file4->Get(var), 
+  if (ymin!=999) {
+    h1->SetMinimum(ymin);
+    h2->SetMinimum(ymin);
+    h3->SetMinimum(ymin);
+    h4->SetMinimum(ymin);
+    cout<<caption<<" "<<ymax<<endl;
+  }
+  if (ymax!=999) {
+    h1->SetMaximum(ymax);
+    h2->SetMaximum(ymax);
+    h3->SetMaximum(ymax);
+    h4->SetMaximum(ymax);
+    //    h1->GetYaxis()->SetRangeUser(ymin,ymax);
+    getC(); h1->Draw(); h2->Draw("same");
+  }
+
+
+  DrawCompare(h1,h2,h3,h4,
+	      //(TH1F*)_file1->Get(var),(TH1F*)_file2->Get(var), (TH1F*)_file3->Get(var),(TH1F*)_file4->Get(var), 
 	      kBlue+3, kBlue-5,kRed+3,kRed-5,"Data2TeV","MC2TeV","Data2TeV","MC5TeV","",caption, true, logy);
 
 }
@@ -60,10 +88,11 @@ void drawtracks()
   Draw("hmva6","MVA discriminator algo6");
   Draw("hmva7","MVA discriminator algo7");
 
-  Draw("hphi","#phi");
+  Draw("hphi","#phi", false, 0, 0.04);
+
   Draw("heta","#eta");
-  Draw("hnhit","\# of hits");
-  Draw("hnTrk","\# of tracks");
+  Draw("hnhit","# of hits");
+  Draw("hnTrk","# of tracks", true);
   Draw("hchi2n","#chi^2 / N_{dof}",true);
   
 
@@ -109,10 +138,10 @@ void drawtracks2()
 
   hpt->SetXTitle("p_{T} [GeV/c]");
 
-  hpt4->SetXTitle("p_{T} [GeV/c]"); hpt4->SetMarkerColor(kred);
-  hpt5->SetXTitle("p_{T} [GeV/c]"); hpt5->SetMarkerColor(kblue);
-  hpt6->SetXTitle("p_{T} [GeV/c]"); hpt6->SetMarkerColor(kgreen);
-  hpt7->SetXTitle("p_{T} [GeV/c]"); hpt7->SetMarkerColor(kGray);
+  hpt4->SetXTitle("p_{T} [GeV/c]"); //hpt4->SetMarkerColor(kred);
+  hpt5->SetXTitle("p_{T} [GeV/c]"); //hpt5->SetMarkerColor(kblue);
+  hpt6->SetXTitle("p_{T} [GeV/c]"); //hpt6->SetMarkerColor(kgreen);
+  hpt7->SetXTitle("p_{T} [GeV/c]"); //hpt7->SetMarkerColor(kGray);
 
   hIPsign->SetXTitle("IP significance");
 

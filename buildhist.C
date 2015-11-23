@@ -18,14 +18,6 @@ void checktracks(TString inputfile, TString outputfile)
 
   TFile *_file0 = new TFile(inputfile);
 
-  /*  TTreeReader reader("ak4PFJetAnalyzer/t", _file0);
-  TTreeReaderValue<int> evt(reader, "evt");
-  TTreeReaderValue<int> nref(reader, "nref");
-  TTreeReaderArray<float> discr_csvSimple(reader, "discr_csvSimple");
-
-  TTreeReader readerhlt("hltanalysis/HltTree", _file0);
-  TTreeReaderValue<int> HLT_AK4CaloJet60_Eta5p1_v1(readerhlt, "HLT_AK4CaloJet60_Eta5p1_v1");
-  */
   TTreeReader readerTrack("anaTrack/trackTree",_file0);
   TTreeReaderValue<int> ntrk(readerTrack, "nTrk");
   TTreeReaderArray<float> trkDxyError1(readerTrack, "trkDxyError1");
@@ -65,7 +57,7 @@ void checktracks(TString inputfile, TString outputfile)
   auto hpt7 = getH("hpt7",50,0,ptmax);
 
   auto hphi = getH("hphi",30,-3.2,3.2);
-  auto heta = getH("heta",30,2.5,2.5);
+  auto heta = getH("heta",30,-3,3);
   auto hnhit = getH("hnhit",26,5,30);
   auto hnTrk = getH("hnTrk",50,0,7000);
 
@@ -85,16 +77,16 @@ void checktracks(TString inputfile, TString outputfile)
 
   int onep = readerTrack.GetEntries(true)/100;
   int counter = 0;
-  //  while(readerTrack.Next()) {
-  while(readerTrack.Next() && counter<1000) {
+  while(readerTrack.Next()) {
+  //  while(readerTrack.Next() && counter<1000) {
     counter++;
     if (counter%onep == 0) std::cout<<counter/onep<<"\%"<<std::endl;
+    hnTrk->Fill(*ntrk);
     for (int i=0;i<*ntrk;i++) {
       if (highPurity[i])
 	hIPsign->Fill(trkDxy1[i]/trkDxyError1[i]);
 	hZsign->Fill(trkDz1[i]/trkDzError1[i]);
 
-	hnTrk->Fill(*ntrk);
 	hchi2n->Fill(trkChi2[i]/trkNdof[i]);
 
 	
